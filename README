@@ -1,0 +1,58 @@
+				   ==============================				
+					MINI-KERMIT Protocol
+				   ==============================
+							    Preda Radu-Alexandru
+
+1)  What is Kermit?
+	The KERMIT protocol is a protocol that is part of the ARQ 
+(Automatic Repeat Request) protocol class, in which an erroneous or unverified
+package is automatically retransmitted. Useful data are packaged, being
+surrounded by some control fields. There is no flow control during the
+transmission of a packet. Each package must be confirmed.
+
+2)  Package structure of MINI-KERMIT
+      A MINI-KERMIT package has 7 fields:
+       -> SOH (1 byte) = Start of Header
+       -> LEN (1 byte) = Number of bytes whitout SOH and LEN fields
+       -> SEQ (1 byte) = Sequence number
+       -> TYPE (1 byte) = In next section
+       -> DATA ([0, MAXL] bytes) = Data to send
+       -> CHECK (2 bytes) = CRC
+       -> MARK (1 byte) = End of Header
+
+3)  Types of packages
+    -> Package "S"
+	Contains 11 fields (each one are 1 byte):
+	* MAXL = Maximum bytes of data
+	* TIME = Maximum time to wait for a package
+	* PADC = Padding character, we will use NULL
+	* EOL = End of line, default it is 0X0D (CR)
+	The rest are set to 0X00 (1 byte each).
+
+    -> Package "F"
+	Within this type of package, the DATA field contains the name of the
+file to be transmitted.
+
+    -> Package "D"
+	Contains data from a file.
+
+    -> Package "Z"
+	Sent all data from a file. Used to signal that a file needs to be
+closed.
+
+    -> Package "B"
+	Sent all files. Quit transmission.
+
+    -> Package "Y"
+	Data was received correctly. Receiver sends this package to signal
+the Sender to send the next package.
+
+    -> Package "N"
+	The data has been corrupted or the package hasn't arrived in TIME
+seconds. Receiver sends this package to signal the Sender to resend the
+previous package.
+
+4)  Implementation details
+	The programs can be executed using the script run_experiment.sh.
+To test the program I used 3 files (files*.bin). The output will be saved
+in the same folder with the names recv_file*.bin.
